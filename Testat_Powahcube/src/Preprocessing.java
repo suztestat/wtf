@@ -2,7 +2,7 @@ import java.util.ArrayList;
 
 public class Preprocessing {
 
-	//kommentar!
+	//kommentar!!
 	private String input;
 	private final char paddingSymbol='~';
 	private final char terminatorSymbol='#';
