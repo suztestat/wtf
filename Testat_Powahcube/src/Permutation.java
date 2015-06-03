@@ -1,6 +1,7 @@
 
 public class Permutation {
 
+	//halloo???
 	int[][][] powahCube;
 	private int k; //key
 	//wtf
