@@ -2,6 +2,7 @@
 public class Permutation {
 
 	//halloo???
+	//hallo 2. ????
 	int[][][] powahCube;
 	private int k; //key
 	//wtf 2. Versuch
