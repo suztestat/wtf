@@ -3,7 +3,7 @@ public class Permutation {
 
 	int[][][] powahCube;
 	private int k; //key
-	
+	//wtf
 	
 	public Permutation(){
 		powahCube = new int[256][256][256];
