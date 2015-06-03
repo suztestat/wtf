@@ -4,7 +4,7 @@ public class Permutation {
 	//halloo???
 	int[][][] powahCube;
 	private int k; //key
-	//wtf
+	//wtf 2. Versuch
 	
 	public Permutation(){
 		powahCube = new int[256][256][256];
