@@ -1,53 +1,50 @@
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-
 
 public class Permutation {
 
 	int[][][] powahCube;
-	private int k; //key
+	private int[] k; //key
 	
+	//1.3
 	public Permutation(){
 		powahCube = new int[256][256][256];
-		//pi()
-		int[] aa={6,6,4,7,9,6,3,3,4,6,6,1};
-	
-		int [] b=N(20,aa);
 		
-		for (int i=0;i<b.length;i++) System.out.print(b[i]+",");
+		int[] k={6,6,4,7,9,6,3,3,4,6,6,1};
+		System.out.println("----");
+		//pi
+		for (int i=0;i<=20;i++){
+			//pi=
+			int[] keyWOutDupl=h(k); 
+			
+			//zur ausgabe
+			int[]f=c(keyWOutDupl,i);
+			int[]g=N(20,keyWOutDupl);
+			
+			for (int i1=0;i1<f.length;i1++) System.out.print(f[i1]+",");
+			for (int i2=0;i2<g.length;i2++) System.out.print(g[i2]+",");
+			
+			System.out.println("");
+			//System.out.println(c(keyWOutDupl,i)+" "+N(65535,keyWOutDupl));
+		}
 	}
 	
 	public int[] N(int laenge, int[] p){
-		
-		List<Integer> listContains = new ArrayList();
+		List<Integer> listContains = new ArrayList<Integer>();
 	    for (int i = 0; i < p.length; i++)
 	    	if (!listContains.contains(p[i])) listContains.add(p[i]);
-	    
-	    System.out.println("jo"+listContains);
-	    if (listContains.contains(3)) System.out.println("Wtf is this shuit");
-		int [] res = new int[laenge-listContains.size()];
+		int [] res = new int[laenge-listContains.size()+1];
 		
 		int fillcount=0;
-		System.out.println("14="+res.length);
-		
-		for (int i=1; i<=laenge;i++){
-			if (!listContains.contains(i)) {
-				res[fillcount]=i+1;
-				System.out.println("geaddet:"+(i+1));
-			}
-			fillcount++;
-		}
-		
-		
-		
-		return null;
+		for (int i=0; i<=laenge;i++)
+			if (!listContains.contains(i)) 
+				res[fillcount++]=i;
+
+		return res;
 	}
 	
-	public int[] shiftArray(int[] arr, int distance){
+	//shiftArray
+	public int[] c(int[] arr, int distance){
 		distance=distance%arr.length; //um eine maximale verschiebung von arr.length zu durchlaufen
 	
 		for (int dist=1;dist<=distance;dist++){
@@ -61,25 +58,19 @@ public class Permutation {
 	}
 	
 	//scheiß performance
-	public int[] removeDuplicates(int[] arr){
-		List <Integer> temp = new ArrayList();
-		for (int i=0;i<arr.length;i++){
+	//removeDuplicates
+	public int[] h(int[] arr){
+		List <Integer> temp = new ArrayList<Integer>();
+		for (int i=0;i<arr.length;i++)
 			if (!temp.contains(arr[i])) temp.add(arr[i]);
-		}
-
+		
 		int[] res = new int [temp.size()];
 		int index=0;
 		for (Integer x:temp) res[index++]=x;
 		
 		return res;
 	}
-	
-	public int h(int k){
 		
-		
-		return 0;
-	}
-	
 	public int pi(int i, int k){
 		
 		
