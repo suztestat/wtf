@@ -8,7 +8,7 @@ public class Main {
 		//Ausgangsmenge der möglichen Zeichen = A = [n] ; n = 65535 -> char Unicode Tabelle
 		String plaintxt = "? 1 Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.";
 		String key = "aaaaaaaaaaaaaakkaaaabcd34dkkk=?";
-		Permutation.removeRedundantElements(key);
+		FuzzCube fuzzy = new FuzzCube(key);
 		//~k = h(k) so hat die i-te V-Slice Permutation PIik die Form PIik= (ci(~k); N).
 		//h(k) = redundate Elemente entfernen
 		//2. Permutation
