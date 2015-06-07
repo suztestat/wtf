@@ -69,6 +69,7 @@ public class Preprocessing {
 		}
 		
 		Printer.printStep("Output", input);
+		Printer.printInHex(input);
 		Printer.printStep("Length", input.length());
 		return input;
 	}
