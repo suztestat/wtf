@@ -10,7 +10,11 @@ public class FuzzCube {
 		shiftElements(key, 2);
 	}
 	
-	//Function h(k), removes redundant elements from the input.
+	/**
+	 * Function h(k), removes redundant elements from the input.
+	 * @param input
+	 * @return output
+	 */
 	public String removeRedundantElements(String input){
 		CharSequence iterChar;
 		String output = "";
@@ -27,7 +31,12 @@ public class FuzzCube {
 		return output;
 	}
 	
-	//Function c(~k), right shift the elements by given distance.
+	/**
+	 * Function c(~k), right shift the elements by given distance.
+	 * @param input
+	 * @param distance
+	 * @return output
+	 */
 	public String shiftElements(String input, Integer distance){
 		String output = "";
 		for(int i = 0; i < input.length(); i++){
