@@ -45,7 +45,7 @@ public class Preprocessing {
 	}
 	
 	/**
-	 * Third step of the preprocessing. Pad the input to a multiple of 512.
+	 * Third step of the preprocessing. Pad the input to a multiple of 512UI.
 	 * The output symbols won't be printed correct in the console. Check the
 	 * hex or integer values for testing.
 	 * @param input
