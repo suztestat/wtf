@@ -2,7 +2,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class Preprocessing {
+public class Preprocessor {
 
 	/**
 	 * First step of the preprocessing. Seperate twins with a fill symbol "pf".
@@ -12,8 +12,8 @@ public class Preprocessing {
 	 */
 	public static String removeTwins(String input){
 		String output = "";
-		for(int i = 1; i < input.length(); i ++){
-			output += input.charAt(i - 1);
+		for(int i = 2; i < input.length(); i += 2){
+			output += input.substring(i-2, i);
 			if(input.charAt(i - 1) == input.charAt(i)){
 				output += "\u0378\u0378";
 			}
