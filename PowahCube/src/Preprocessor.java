@@ -88,7 +88,7 @@ public class Preprocessor {
 			subList.add(input.substring(i, i+512));
 		}
 		
-		Printer.printList("Block", subList);
+		Printer.printList(subList);
 		return subList;
 	}
 }

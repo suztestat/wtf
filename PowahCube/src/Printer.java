@@ -16,9 +16,36 @@ public class Printer {
 		System.out.println(step + ": " + input);
 	}
 	
-	public static void printList(String name, List inputList){
-		for(int i = 0; i < inputList.size(); i ++)
-			System.out.println(name + " " + i + ": " + inputList.get(i).toString());
+	public static void printList(List inputList){
+		for(int i = 0; i < inputList.size(); i ++){
+			if(i % 32 == 0)
+				System.out.println();
+			System.out.print(inputList.get(i).toString() + "\t");
+		}
+	}
+	
+	public static void printIntArray(Integer[] mFuzzCube){
+		System.out.println();
+		for(int i = 0; i < mFuzzCube.length; i++)
+			System.out.print(mFuzzCube[i] + "\t");
+	}
+	
+	public static void printIntArray(Integer[][] input){
+		System.out.println();
+		for(int i = 0; i < input.length; i++){
+			System.out.println();
+			for(int j = 0; j < input[i].length; j++)
+				System.out.print(input[i][j] + "\t");
+		}
+	}
+	
+	public static void printIntArray(Integer[][][] input){
+		System.out.println("PRINT");
+		for(int i = 0; i < input.length; i++){
+			System.out.println();
+			for(int j = 0; j < input[i].length; j++)
+					System.out.print(input[i][j][0] + "\t"); //Nur als Test
+		}
 	}
 	
 	public static void printInHex(String input){
@@ -29,5 +56,11 @@ public class Printer {
 				System.out.print(" \\u" + Integer.toHexString(input.charAt(i) | 0x10000).substring(1));
 		}
 		System.out.println();
+	}
+	
+	public static void toString(Integer[] input){
+		for(int i = 0; i < input.length; i++){
+			System.out.print(input[i].toString());
+		}
 	}
 }

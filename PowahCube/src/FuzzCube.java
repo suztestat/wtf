@@ -3,26 +3,33 @@ import java.util.List;
 
 
 public class FuzzCube {
-	private int[][][] mFuzzCube;
+	private Integer[][][] mFuzzCube;
 	
 	public FuzzCube(String key){
-		mFuzzCube = new int[256][256][256];
+		mFuzzCube = new Integer[256][256][256];
 		String test = "asldkghdsalkghdsalkhglkdsahgdslkghlkdshgasldkghdsalkghdsalkhglkdsahgdslkghlkdshgasldkghdsalkghdsalkhglkdsahgdslkghlkdshgasldkghdsalkghdsalkhglkdsahgdslkghlkdshgasldkghdsalkghdsalkhglkdsahgdslkghlkdshgasldkghdsalkghdsalkhglkdsahgdslkghlkdshgasldkghdsalkghdsalkhglkdsahgdslkghlkdshgasldkghdsalkghdsalkhglkdsahgdslkghlkdshgasldkghdsalkghdsalkhglkdsahgdslkghlkdshgasldkghdsalkghdsalkhglkdsahgdslkghlkdshgasldkghdsalkghdsalkhglkdsahgdslkghlkdshgasldkghdsalkghdsalkhglkdsahgdslkghlkdshgasldkghdsalkghdsalkhglkdsahgdslkghlkdshgasldkghdsalkghdsalkhglkdsahgdslkghlkdshgasldkghdsalkghdsalkhglkdsahgdslkghlkdshgasldkghdsalkghdsalkhglkdsahgdslkghlkdshgasldkghdsalkghdsalkhglkdsahgdslkghlkdshgasldkghdsalkghdsalkhglkdsahgdslkghlkdshgasldkghdsalkghdsalkhglkdsahgdslkghlkdshgasldkghdsalkghdsalkhglkdsahgdslkghlkdshgasldkghdsalkghdsalkhglkdsahgdslkghlkdshgasldkghdsalkghdsalkhglkdsahgdslkghlkdshgasldkghdsalkghdsalkhglkdsahgdslkghlkdshgasldkghdsalkghdsalkhglkdsahgdslkghlkdshgasldkghdsalkghdsalkhglkdsahgdslkghlkdshgasldkghdsalkghdsalkhglkdsahgdslkghlkdshgasldkghdsalkghdsalkhglkdsahgdslkghlkdshgasldkghdsalkghdsalkhglkdsahgdslkghlkdshgasldkghdsalkghdsalkhglkdsahgdslkghlkdshgasldkghdsalkghdsalkhglkdsahgdslkghlkdshgasldkghdsalkghdsalkhglkdsahgdslkghlkdshgasldkghdsalkghdsalkhglkdsahgdslkghlkdshgasldkghdsalkghdsalkhglkdsahgdslkghlkdshgasldkghdsalkghdsalkhglkdsahgdslkghlkdshgasldkghdsalkghdsalkhglkdsahgdslkghlkdshgasldkghdsalkghdsalkhglkdsahgdslkghlkdshgasldkghdsalkghdsalkhglkdsahgdslkghlkdshgasldkghdsalkghdsalkhglkdsahgdslkghlkdshgasldkghdsalkghdsalkhglkdsahgdslkghlkdshgasldkghdsalkghdsalkhglkdsahgdslkghlkdshg";
 		//TEST
-		key = removeRedundantElements(key);
-		shiftElements(key, 3);
-		List<String> testList = splitSlices(test);
-		fillVSlice(testList, 0);
+		List<Integer> testInt = getIntegerFromInput(key);
+		testInt = removeRedundantElements(testInt);
+		testInt = shiftElements(testInt, 3);
+		List<Integer> complements = fillComplement(testInt, 15);
+		Integer[][] testSplit = splitSlices(testInt);
+		fillVSlice(testSplit, 0);
 	}
 	
+	/**
+	 * Create a enumeration for the input and return it as an arraylist.
+	 * @param input
+	 * @return output
+	 */
 	public List<Integer> getIntegerFromInput(String input){
-		List<Integer> inputList = new ArrayList();
+		List<Integer> output = new ArrayList();
 		
 		for(int i = 0; i < input.length(); i ++){
-			inputList.add((int)input.charAt(i));
+			output.add((int)input.charAt(i));
 		}
 		
-		return inputList;
+		return output;
 	}
 	
 	/**
@@ -30,19 +37,19 @@ public class FuzzCube {
 	 * @param input
 	 * @return output
 	 */
-	public String removeRedundantElements(String input){
-		CharSequence iterChar;
-		String output = "";
+	public List<Integer> removeRedundantElements(List<Integer> input){
+		List<Integer> output = new ArrayList();
 		
-		for(int i = 0; i < input.length(); i++){
+		Printer.printHeader("Remove redundant elements");
+		
+		for(int i = 0; i < input.size(); i++){
 			//Look whether the output already contains the iterChar.
-			iterChar = input.subSequence(i, i + 1);
-			if(!output.contains(iterChar))
+			if(!output.contains(input.get(i)))
 				//If not, append it.
-				output += iterChar;
+				output.add(input.get(i));
 		}
 		
-		Printer.printOperation("Remove redundant Elements", input, output);
+		Printer.printList(output);
 		return output;
 	}
 	
@@ -52,14 +59,16 @@ public class FuzzCube {
 	 * @param distance
 	 * @return output
 	 */
-	public String shiftElements(String input, Integer distance){
-		String output = "";
-		for(int i = 0; i < input.length(); i++){
-			output += input.substring((input.length() - distance + i)%input.length(), 
-					(input.length() - distance + i)%input.length() + 1);
+	public List<Integer> shiftElements(List<Integer> input, Integer distance){
+		List<Integer> output = new ArrayList();
+		
+		Printer.printHeader("Shift Elements");
+		
+		for(int i = 0; i < input.size(); i++){
+			output.add(input.get((input.size()-distance+i)%input.size()));
 		}
 		
-		Printer.printOperation("Shift Elements", input, output);
+		Printer.printList(output);
 		return output;
 	}
 	
@@ -69,46 +78,54 @@ public class FuzzCube {
 	 * @param number
 	 * @return output
 	 */
-	public String fillComplement(String input, Integer number){
-		String output = "";
+	public List<Integer> fillComplement(List<Integer> input, Integer number){
+		List<Integer> output = new ArrayList();
+		
+		Printer.printHeader("Fill Complement");
+		
 		for(int i = 0; i < number; i++){
-			if(!input.contains("" + (char)i))
-				output += (char)i;
+			if(!input.contains(i))
+				output.add(i);
 		}
+		
+		Printer.printList(output);
 		return output;
-	}
-	
-	public List<String> splitSlices(String input){
-		List<String> outputList = new ArrayList();
-		
-		Printer.printHeader("Split Slices");
-		Printer.printStep("Input", input);
-		for(int i = 0; i < input.length(); i += 256){
-			if(input.length() > i+256)
-				outputList.add(input.substring(i, i+256));
-			else
-				outputList.add(input.substring(i, input.length()));
-		}
-		
-		Printer.printList("Output", outputList);
-		return outputList;
 	}
 	
 	/**
 	 * 
-	 * @param inputList
+	 * @param input
+	 * @return output
+	 */
+	public Integer[][] splitSlices(List<Integer> input){
+		Integer[][] output = new Integer[(int)(input.size()/256.0F) + 1][256]; //TODO
+		
+		Printer.printHeader("Split Slices");
+		
+		int i = 0;
+		for(int j = 0; j < input.size(); j++){
+			if(j % 256 == 0 && j > 0){
+				i ++;
+			}
+			output[i][j%256] = input.get(j);
+		}
+		
+		Printer.printIntArray(output);
+		return output;
+	}
+	
+	/**
+	 * 
+	 * @param input
 	 * @param zIndex
 	 */
-	public void fillVSlice(List<String> inputList, Integer zIndex){
-		List<Integer> iterList = new ArrayList();
+	public void fillVSlice(Integer[][] input, Integer zIndex){
 		
-		for(int i = 0; i < inputList.size(); i ++){
-			iterList = getIntegerFromInput(inputList.get(i));
-			for(int j = 0; j < iterList.size(); j ++){
-				mFuzzCube[i][j][zIndex] = iterList.get(j);
-			}
+		for(int i = 0; i < input.length; i ++){
+			for(int j = 0; j < input[i].length; j++)
+				mFuzzCube[i][j][zIndex] = input[i][j];
 		}
 
-		//TODO AUSGABE
+		Printer.printIntArray(mFuzzCube);
 	}
 }
