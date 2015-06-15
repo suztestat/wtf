@@ -1,94 +1,154 @@
 import java.util.ArrayList;
 import java.util.List;
 
-
+/**
+ * This class processes the input strings/arrays to 512 UI long blocks.
+ * @author Erich Dyck
+ *
+ */
 public class Preprocessor {
+	
+	/**
+	 * Preprocess scheduler
+	 * 1. Remove twins
+	 * 2. Pad terminator symbol
+	 * 3. Pad to a multiple of 512 UI
+	 * 4. Return an integer array with 512 UI long blocks.
+	 * 
+	 * This class works with integers from the beginning to make
+	 * the whole project consistent.
+	 * @param str
+	 * @return preprocessed integer array.
+	 */
+	public Integer[][] preprocess(String str){
+		Integer[] inArr = getIntFromStr(str);
+		List<Integer> inList = removeTwins(inArr);
+		inList = padTerminator(inList);
+		inList = padMultipleUI(inList);
+		return getBlocks(inList);
+	}
+	
+	/**
+	 * An overloaded preprocess scheduler like above, with the difference, that this
+	 * one accepts integer array inputs.
+	 * @param input integer array
+	 * @return preprocessed integer array.
+	 */
+	public Integer[][] preprocess(Integer[] input){
+		List<Integer> inList = removeTwins(input);
+		inList = padTerminator(inList);
+		inList = padMultipleUI(inList);
+		return getBlocks(inList);
+	}
+	
+	/**
+	 * Create a enumeration for the input and return it as an integer array.
+	 * @param str
+	 * @return output integer array
+	 */
+	private Integer[] getIntFromStr(String str){
+		Integer[] output = new Integer[str.length()];
+		
+		for(int i = 0; i < str.length(); i ++){
+			output[i] = (int)str.charAt(i);
+		}
+		
+		return output;
+	}
 
 	/**
 	 * First step of the preprocessing. Seperate twins with a fill symbol "pf".
-	 * pf = 0378 (ndef in unicode)
-	 * @param input
-	 * @return output
+	 * pf = 0x0378 (ndef in unicode)
+	 * @param input integer array
+	 * @return output array list
 	 */
-	public static String removeTwins(String input){
-		String output = "";
-		for(int i = 2; i < input.length(); i += 2){
-			output += input.substring(i-2, i);
-			if(input.charAt(i - 1) == input.charAt(i)){
-				output += "\u0378\u0378";
+	public List<Integer> removeTwins(Integer[] input){
+		List<Integer> output = new ArrayList<Integer>();
+		
+		for(int i = 0; i < input.length - 1; i += 2){
+			output.add(input[i]);
+			if(input[i] == input[i+1]){
+				output.add((int)'\u0378');
+				output.add((int)'\u0378');
 			}
+			output.add(input[i+1]);
 		}
-		output += input.charAt(input.length() - 1);
-		Printer.printOperation("Preprocessing", input, output);
+		if(input.length % 2 == 1)
+			output.add(input[input.length - 1]);
+		Printer.printIntArrToStr(input);
+		Printer.printIntListToStr(output);
+		
 		return output;
 	}
 	
 	/**
 	 * Second step of the preprocessing. Pad a terminator symbol "pt" to the input if the
-	 * length is an even number.
+	 * size is an even number.
 	 * If it isn't pad the fill symbol "pf" and then the terminator symbol "pt"
-	 * pf = 0378 (ndef in unicode)
-	 * pt = 0379 (ndef in unicode)
-	 * @param input
-	 * @return input
+	 * pf = 0x0378 (ndef in unicode)
+	 * pt = 0x0379 (ndef in unicode)
+	 * @param input list
+	 * @return padded input list
 	 */
-	public static String padTerminator(String input){
+	public List<Integer> padTerminator(List<Integer> input){
 		Printer.printHeader("Pad terminator");
 		Printer.printStep("Input", input);
-		if(input.length() % 2 == 0)
-			input += "\u0378\u0379";
+		if(input.size() % 2 == 0){
+			input.add((int)'\u0378');
+			input.add((int)'\u0379');
+		}
 		else
-			input += '\u0379';
+			input.add((int)'\u0379');
 		
-		Printer.printStep("Output", input);
+		Printer.printIntListToStr(input);
 		return input;
 	}
 	
 	/**
 	 * Third step of the preprocessing. Pad the input to a multiple of 512UI.
-	 * The output symbols won't be printed correct in the console. Check the
-	 * hex or integer values for testing.
-	 * @param input
-	 * @return input
+	 * @param input list
+	 * @return padded input list
 	 */
-	public static String padMultipleUI(String input){
-		char lastSymb = input.charAt(input.length() - 1);
-		int i = 0;
-		
-		Printer.printHeader("Pad multiple UI");
-		Printer.printStep("Input", input);
-		char padSymb = '\0';
-		while(input.length() % 512 != 0){
-			padSymb = (char)(lastSymb + i % 65536);
-			if(padSymb == '\u0379'){
+	public List<Integer> padMultipleUI(List<Integer> input){
+		Integer lastSymb = input.get(input.size() - 1);
+
+		int padSymb = 0, i = 0;
+		while(input.size() % 512 != 0){
+			padSymb = lastSymb + i % 65536;
+			if(padSymb == (int)'\u0379'){
 				i++;
-				padSymb = (char)( lastSymb + i % 65536);
+				padSymb = lastSymb + i % 65536;
 			}
-			input += padSymb;
+			input.add(padSymb);
 			i++;
 		}
 		
-		Printer.printStep("Output", input);
-		Printer.printInHex(input);
-		Printer.printStep("Length", input.length());
+		Printer.printIntListToStr(input);
+		System.out.println(input.size());
 		return input;
 	}
 	
 	/**
-	 * Fourth step of the preprocessing. Split the input into 512 UI strings and return
-	 * them in a list.
-	 * @param input
-	 * @return subList
+	 * Fourth step of the preprocessing. Split the input into 512 UI long blocks and return
+	 * them in an integer array.
+	 * @param input list
+	 * @return output integer array
 	 */
-	public static List<String> getSubstringList(String input){
-		List<String> subList = new ArrayList();
+	public Integer[][] getBlocks(List<Integer> input){
+		Integer[][] output = new Integer[(int)Math.ceil(input.size()/512.0F)][];
 		
-		Printer.printHeader("Build substrings");
-		for(int i = 0; i < input.length(); i += 512){
-			subList.add(input.substring(i, i+512));
+		int k = 0;
+		for(int i = 0 ; i < output.length; i ++){
+			if(input.size() - i >= 512)
+				output[i] = new Integer[512];
+			else
+				output[i] = new Integer[input.size() - i];
+			for(int j = 0; j < output[i].length ; j ++){
+				output[i][j] = input.get(k);
+				k ++;
+			}
 		}
-		
-		Printer.printList(subList);
-		return subList;
+
+		return output;
 	}
 }
