@@ -1,4 +1,7 @@
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * 1.Eingabe I auf I' abbilden. Preprocessing
@@ -97,22 +100,39 @@ public class Main {
 		
 
 		String plaintxt = "? 1 Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.";
-		String key = "12";
+		String key = "";
 		String randomKey = "";
 		for(int i = 0; i < 64000; i ++){
 			//key += (char)(64 + i);
 			randomKey += (char)((Math.random()*100000)%64000);
 		}
-		FuzzCube fuzzy = new FuzzCube();
-		//fuzzy.generateOmega(randomKey);
-		fuzzy.permuteCube(randomKey);
-		//3. Preprocessing
-		//String testPreprocessingA = "aaabcdefghhijklmmnoppqqrstuvwxxxyzzzzzZ";
-		//String testPreprocessingB = "? 1 Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem? 1 Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lo? 1 Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lo ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.";
-		//Preprocessor proc = new Preprocessor();
-		//Integer[][] preprocessed = proc.preprocess(testPreprocessingA);
-		//4. Fuzzying
-		//5. Feistel-Netz
-		//6. Entschlüsselung
+		Long start = System.currentTimeMillis();
+		FuzzCube fuzzy = new FuzzCube(key);
+		fuzzy.buildFuzzCube();
+		//Printer.checkCube(fuzzy.getFuzzCube());
+		String testPreprocessingA = "aaabcdefghhijklmmnoppqqrstuvwxxxyzzzzzZ";
+		///String testPreprocessingB = "? 1 Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem? 1 Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lo? 1 Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lo ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.";
+		Preprocessor proc = new Preprocessor();
+		Integer[][] preprocessed = proc.preprocess(testPreprocessingA);
+		for(int i = 0; i < preprocessed.length; i ++){
+			System.out.println();
+			for(int j = 0 ; j < preprocessed[i].length; j++)
+				System.out.print(preprocessed[i][j] + "\t");
+		}
+		//fuzzy.fuzzInput(preprocessed);
+		fuzzy.fuzz(preprocessed);
+		for(int i = 0; i < preprocessed.length; i ++){
+			System.out.println();
+			for(int j = 0 ; j < preprocessed[i].length; j++)
+				System.out.print(preprocessed[i][j] + "\t");
+		}
+		
+		Long end = System.currentTimeMillis();
+		System.out.println("Runtime: " + (end - start));
+		
+		/*String fu = "";
+		for(int i = 0 ; i < 100000 ; i ++){
+			fu += (char)i;
+		}*/
 	}
 }

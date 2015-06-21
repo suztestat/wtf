@@ -1,3 +1,4 @@
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -51,16 +52,46 @@ public class Printer {
 			System.out.print(mFuzzCube[i] + "\t");
 	}
 	
-	public static void printIntArray(Integer[][] input){
+	public static void printIntArray(Integer[][] input, Integer count){
 		
-		for(int i = 0 ; i < input.length; i++){
-			System.out.println();
-			for(int j = 0 ; j < input[i].length; j++){
-				System.out.print(input[i][j] + "\t");
+		int iter = 0; 
+		for(int i = 0 ; i < input[0].length; i++){
+			if(iter < count){
+				System.out.println();
+				for(int j = 0 ; j < input.length; j++){
+					if(iter < count)
+						System.out.print(input[j][i] + "\t");
+					iter ++;
+				}
 			}
 		}
 			
 		System.out.println();
+	}
+	
+	public static void checkCube(Integer[][][] cube){
+		Set<Integer> checkSet = new HashSet<Integer>();
+		boolean duplicate = false;
+		for(int i = 0 ; i < 256; i++){
+			checkSet = new HashSet<Integer>();
+			for(int j = 0; j < 256; j ++){
+				for(int k = 0; k < 256; k++){
+					if(checkSet.add(cube[k][j][i]) == false){
+						System.out.println("Error: Duplicate entry: " + cube[k][j][i]);
+						System.out.println("Error: At permutation z: " + i);
+						duplicate = true;
+					}
+					else
+						duplicate = false;
+				}
+			}
+			if(duplicate == false)
+				System.out.println("Permutation z: " + i + " is correct");
+			for(int z = 0; z < 65536; z ++){
+				if(!checkSet.contains(z))
+					System.out.println("Set doesn't contain: " + z + " at z: " + i);
+			}
+		}
 	}
 	
 	public static void printIntArray(Integer[][][] input, int zIndex){

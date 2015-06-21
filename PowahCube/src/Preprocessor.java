@@ -75,8 +75,8 @@ public class Preprocessor {
 		}
 		if(input.length % 2 == 1)
 			output.add(input[input.length - 1]);
-		Printer.printIntArrToStr(input);
-		Printer.printIntListToStr(output);
+		//Printer.printIntArrToStr(input);
+		//Printer.printIntListToStr(output);
 		
 		return output;
 	}
@@ -91,8 +91,8 @@ public class Preprocessor {
 	 * @return padded input list
 	 */
 	public List<Integer> padTerminator(List<Integer> input){
-		Printer.printHeader("Pad terminator");
-		Printer.printStep("Input", input);
+		//Printer.printHeader("Pad terminator");
+		//Printer.printStep("Input", input);
 		if(input.size() % 2 == 0){
 			input.add((int)'\u0378');
 			input.add((int)'\u0379');
@@ -100,7 +100,7 @@ public class Preprocessor {
 		else
 			input.add((int)'\u0379');
 		
-		Printer.printIntListToStr(input);
+		//Printer.printIntListToStr(input);
 		return input;
 	}
 	
@@ -123,8 +123,8 @@ public class Preprocessor {
 			i++;
 		}
 		
-		Printer.printIntListToStr(input);
-		System.out.println(input.size());
+		//Printer.printIntListToStr(input);
+		//System.out.println(input.size());
 		return input;
 	}
 	
@@ -142,7 +142,7 @@ public class Preprocessor {
 			if(input.size() - i >= 512)
 				output[i] = new Integer[512];
 			else
-				output[i] = new Integer[input.size() - i];
+				output[i] = new Integer[input.size() - i]; //Should never happens
 			for(int j = 0; j < output[i].length ; j ++){
 				output[i][j] = input.get(k);
 				k ++;
