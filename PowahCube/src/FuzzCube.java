@@ -10,6 +10,7 @@ public class FuzzCube {
 		if(key.length() < 65536){
 			mFuzzCube = new Integer[256][256][256];
 			mKey = getIntFromStr(key);
+			buildFuzzCube();
 		} else
 			throw new IllegalArgumentException("The key is too long.");
 	}
@@ -18,17 +19,33 @@ public class FuzzCube {
 		if(key.length < 65536){
 			mFuzzCube = new Integer[256][256][256];
 			mKey = key;
+			buildFuzzCube();
 		} else
 			throw new IllegalArgumentException("The key is too long.");
 	}
 	
-	public void fuzz(Integer[][] input){
-		System.out.println();
-		int z=0, xA = 0, xB = 0, yA = 0, yB = 0;
+	private void buildFuzzCube(){
+		Set<Integer> keySet = removeRedundantElements(mKey);
+		Set<Integer> compSet = getNcomplement(keySet, 65535);
+		
+		Integer[][] omega = fillV_Slice(keySet);
+		omega = padV_Slice(omega, compSet);
+		generateCube(omega, keySet, compSet);
+	}
+	
+	public Integer[][] fuzz(Integer[][] input, boolean isFuzzed){ //isFuzzed == false -> fuzz, isFuzzed == true -> unfuzz
+		int z = 0, xA = 0, xB = 0, yA = 0, yB = 0, direction = 1;
+		if(isFuzzed == true){
+			direction = -1;
+		}
+		//System.out.println("Direction: " + direction);
+		//System.out.println();
 		boolean firstFound = false, secondFound = false;
 		for(int i = 0; i < input.length; i ++){
-			z=0;
-			for(int j = 0; j < input[i].length - 1; j++){
+			z = 0;
+			
+			for(int j = 0; j < input[i].length; j += 2){
+				//System.out.println("Checking: " + input[i][j] + " and: " + input[i][j+1]);
 				for(int k=0 ; k < 65536; k++){
 					if(input[i][j].equals(mFuzzCube[k%256][k/256][z%256])){
 						firstFound = true;
@@ -47,35 +64,27 @@ public class FuzzCube {
 					}
 				}
 				if(yA == yB){
-					System.out.println("Same Row; Input: " + input[i][j] + " changed to: " + mFuzzCube[(xA + 1)%256][yA][z%256] + " and Input: " + input[i][j+1] + " changed to: " + mFuzzCube[(xB + 1)%256][yB][z%256] +
-							" Details: \nxA: " + xA + " changed to: " + ((xA + 1)%256) + " yA: " + yA + " changed to: " + yA + "\nxB: "+ xB + " changed to: " + ((xB + 1)%256) + " yB: " + yB + " changed to: " + yB);
-					input[i][j] = mFuzzCube[(xA + 1)%256][yA][z%256];
-					input[i][j + 1] = mFuzzCube[(xB + 1)%256][yB][z%256];
+					//System.out.println("Same Row; Input: " + input[i][j] + " changed to: " + mFuzzCube[(((xA + direction)%256)+256)%256][yA][z%256] + " and Input: " + input[i][j+1] + " changed to: " + mFuzzCube[(((xB + direction)%256)+256)%256][yB][z%256] +
+							//" Details: \nxA: " + xA + " changed to: " + ((((xA + direction)%256)+256)%256) + " yA: " + yA + " changed to: " + yA + "\nxB: "+ xB + " changed to: " + ((((xB + direction)%256)+256)%256) + " yB: " + yB + " changed to: " + yB);
+					input[i][j] = mFuzzCube[(((xA + direction)%256)+256)%256][yA][z%256];
+					input[i][j + 1] = mFuzzCube[(((xB + direction)%256)+256)%256][yB][z%256];
 				}
-				if(yA != yB && xA == xB){
-					System.out.println("Same Column; Input: " + input[i][j] + " changed to: " + mFuzzCube[xA][(yA + 1)%256][z%256] + " and Input: " + input[i][j+1] + " changed to: " + mFuzzCube[xB][(yB + 1)%256][z%256] +
-							" Details: \nxA: " + xA + " changed to: " + xA + " yA: " + yA + " changed to: " + (yA + 1)%256 + "\nxB: "+ xB + " changed to: " + xB + " yB: " + yB + " changed to: " + (yB + 1)%256);
-					input[i][j] = mFuzzCube[xA][(yA + 1)%256][z%256];
-					input[i][j + 1] = mFuzzCube[xB][(yB + 1)%256][z%256];
+				if(xA == xB){
+					//System.out.println("Same Column; Input: " + input[i][j] + " changed to: " + mFuzzCube[xA][(((yA + direction)%256)+256)%256][z%256] + " and Input: " + input[i][j+1] + " changed to: " + mFuzzCube[xB][(((yB + direction)%256)+256)%256][z%256] +
+							//" Details: \nxA: " + xA + " changed to: " + xA + " yA: " + yA + " changed to: " + ((((yA + direction)%256)+256)%256) + "\nxB: "+ xB + " changed to: " + xB + " yB: " + yB + " changed to: " + ((((yB + direction)%256)+256)%256));
+					input[i][j] = mFuzzCube[xA][(((yA + direction)%256)+256)%256][z%256];
+					input[i][j + 1] = mFuzzCube[xB][(((yB + direction)%256)+256)%256][z%256];
 				}
 				if(yA != yB && xA != xB){
-					System.out.println("Not same Row/Column; Input: " + input[i][j] + " changed to: " + mFuzzCube[xB][yA][z%256] + " and Input: " + input[i][j+1] + " changed to: " + mFuzzCube[xA][yB][z%256] +
-							" Details: \nxA: " + xA + " changed to: " + xB + " yA: " + yA + " changed to: " + yA + "\nxB: "+ xB + " changed to: " + xA + " yB: " + yB + " changed to: " + yB);
+					//System.out.println("Not same Row/Column; Input: " + input[i][j] + " changed to: " + mFuzzCube[xB][yA][z%256] + " and Input: " + input[i][j+1] + " changed to: " + mFuzzCube[xA][yB][z%256] +
+							//" Details: \nxA: " + xA + " changed to: " + xB + " yA: " + yA + " changed to: " + yA + "\nxB: "+ xB + " changed to: " + xA + " yB: " + yB + " changed to: " + yB);
 					input[i][j] = mFuzzCube[xB][yA][z%256];
 					input[i][j + 1] = mFuzzCube[xA][yB][z%256];
 				}
-				z++;
+				z ++;
 			}
 		}
-	}
-
-	public void buildFuzzCube(){
-		Set<Integer> keySet = removeRedundantElements(mKey);
-		Set<Integer> compSet = getNcomplement(keySet, 65535);
-		
-		Integer[][] omega = fillV_Slice(keySet);
-		omega = padV_Slice(omega, compSet);
-		generateCube(omega, keySet, compSet);
+		return input;
 	}
 	
 	public void generateCube(Integer[][] vSlice, Set<Integer> keySet, Set<Integer> compSet){
@@ -92,7 +101,7 @@ public class FuzzCube {
 			}
 		}
 		
-		Printer.printIntArray(firstPer, 65536);
+		//Printer.printIntArray(firstPer, 65536);
 	}
 	
 	private Integer[][] fillV_Slice(Set<Integer> input){

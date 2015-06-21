@@ -151,4 +151,43 @@ public class Preprocessor {
 
 		return output;
 	}
+	
+	public Integer[][] reversePreToInt(Integer[][] input){
+		Integer[][] output = new Integer[input.length][512];
+		boolean reachedTerm = false;
+		for(int i = 0; i < input.length; i ++){
+			for(int j = 0; j < input[i].length; j++){
+				if(input[i][j].equals((int)'\u0379')){
+					reachedTerm = true;
+					break;
+				}
+				if(!input[i][j].equals((int)'\u0378'))
+					output[i][j] = input[i][j];
+			}
+			if(reachedTerm == true)
+				break;
+		}
+		
+		return output;
+	}
+	
+	public String reversePreToStr(Integer[][] input){
+		String output = "";
+		boolean reachedTerm = false;
+		
+		for(int i = 0 ; i < input.length; i ++){
+			for(int j = 0; j < input[i].length; j++){
+				if(input[i][j].equals((int)'\u0379')){
+					reachedTerm = true;
+					break;
+				}
+				if(!input[i][j].equals((int)'\u0378'))
+					output += (char)input[i][j].intValue();
+			}
+			if(reachedTerm == true)
+				break;
+		}
+		
+		return output;
+	}
 }
