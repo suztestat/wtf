@@ -2,8 +2,7 @@ import static org.junit.Assert.*;
 
 import java.util.HashSet;
 import java.util.Set;
-
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
@@ -14,31 +13,31 @@ import org.junit.Test;
  */
 public class TestCube {
 
-	String key;
-	String plaintxt;
-	FuzzCube fuzz;
-	Preprocessor prep;
-	Feistel feistel;
-	Integer[][] omega;
-	Integer[][][] fuzzCube;
-	Integer[][] permutation;
-	Integer[] intKey;
-	Set<Integer> keySet;
-	Set<Integer> compSet;
-	Integer[][] preprocessedText;
-	Integer[][] fuzzedText;
-	Integer[][] roundKeys;
-	Integer[][] invertedRoundKeys;
-	Integer[][] encrypted;
-	Integer[][] decrypted;
-	Integer[][] unfuzzed;
+	private static String key;
+	private static String plaintxt;
+	private static FuzzCube fuzz;
+	private static Preprocessor prep;
+	private static Feistel feistel;
+	private static Integer[][] omega;
+	private static Integer[][][] fuzzCube;
+	private static Integer[][] permutation;
+	private static Integer[] intKey;
+	private static Set<Integer> keySet;
+	private static Set<Integer> compSet;
+	private static Integer[][] preprocessedText;
+	private static Integer[][] fuzzedText;
+	private static Integer[][] roundKeys;
+	private static Integer[][] invertedRoundKeys;
+	private static Integer[][] encrypted;
+	private static Integer[][] decrypted;
+	private static Integer[][] unfuzzed;
 	
-	Integer[][] sameRow = new Integer[2][256];
-	Integer[][] sameColumn = new Integer[2][256];
-	Integer[][] bothDifferent = new Integer[2][256];
+	private static Integer[][] sameRow = new Integer[2][256];
+	private static Integer[][] sameColumn = new Integer[2][256];
+	private static Integer[][] bothDifferent = new Integer[2][256];
 	
-	@Before
-	public void setUp(){
+	@BeforeClass //Do the setup only once for all tests.
+	public static void setUp(){
 		/*Only task 1 (I worked alone), no random keys or plaintexts. If it should be random, 
 		 * the symbols pf and pt 
 		 * should be declared dynamically to prevent that the random text contains them.
@@ -71,7 +70,7 @@ public class TestCube {
 	}
 	
 	@Test
-	public void test() {
+	public void testOmega() {
 		/*Test omega (Only one vSlice, because all other would look the same), 
 		 * whether it has no duplicates and all 65536 elements in it.
 		 * If it has no duplicates, it should (in this implementation) also have all elements.
@@ -80,33 +79,43 @@ public class TestCube {
 		for(int j = 0; j < 256; j ++){
 			for(int k = 0; k < 256; k++){
 				//Check for duplicates.
-				assertEquals(true, checkSet.add(omega[k][j]));
+				assertEquals("Duplicate entry found.", 
+						true, checkSet.add(omega[k][j]));
 			}
 		}
 		for(int i = 0; i < 65536; i ++){
 			//Check whether omega has all 65536 elements;
-			assertEquals(true, checkSet.contains(i));
+			assertEquals("Omega hasn't all elements.",
+					true, checkSet.contains(i));
 		}
-		
+	}
+
+	@Test
+	public void testPermutation(){
 		/* Test the permutations, whether the key is right-shifted on i positions, 
-		 * where i is the number of the the permutation and whether aleph is not shifted.
+		 * where i is the number of the permutation, and whether aleph is not shifted.
 		 * In this task there is no restriction about the interface argument types, that's why
-		 * I still use Sets. Anyway this interfaces are not for the encryption or decryption,
+		 * there are still used Sets. Anyway this interfaces are not used for the encryption or decryption,
 		 * they are only public for the junit tests.
 		 */
 		for(int i = 0 ; i < 256; i ++){
 			permutation = fuzz.generatePermutation(keySet, compSet, i); //returns one permutation.
 			int j = 0;
 			for(Integer iter : keySet){ // Check if k~(i) = pi(i+j % k~.size())
-				assertEquals(iter, permutation[((j + i)%keySet.size())%256][((j + i)%keySet.size())/256]);
+				assertEquals("Wrong right-shifted",
+						iter, permutation[((j + i)%keySet.size())%256][((j + i)%keySet.size())/256]);
 				j ++;
 			}
 			for(Integer iter : compSet){ // Check if N(l) = pi(l) for l > (|k~| - 1)
-				assertEquals(iter, permutation[j%256][j/256]);
+				assertEquals("Aleph was shifted", 
+						iter, permutation[j%256][j/256]);
 				j ++;
 			}
 		}
-		
+	}
+
+	@Test
+	public void testFuzzCube(){
 		/*Test whether all vSlices in the fuzzCube are correctly permutated.
 		 * Iterate vSlice i in the fuzzCube and compare it to the
 		 * new generated permutation on omega.
@@ -114,11 +123,15 @@ public class TestCube {
 		for(int i = 0; i < 256; i ++){
 			permutation = fuzz.generatePermutation(keySet, compSet, i); //returns one permutation.
 			for(int j = 0; j < 65536; j++){ //j%256 = x, j/256 = y
-				assertEquals(fuzzCube[j%256][j/256][i], 
+				assertEquals("V-Slice: " + i + " was not correctly permuted", 
+						fuzzCube[j%256][j/256][i], 
 						omega[permutation[j%256][j/256]%256][permutation[j%256][j/256]/256]);
 			}
 		}
-		
+	}
+
+	@Test
+	public void testRoundKeys(){
 		/*Test whether the round keys are correctly generated.
 		 * Iterate through the round keys and compare their elements with the
 		 * elements in hSlice sh,4*i(4*i,j).
@@ -126,10 +139,14 @@ public class TestCube {
 		 */
 		for(int i = 0; i < 64; i++){
 			for(int j = 0; j < 256; j ++){
-				assertEquals(roundKeys[i][j], fuzzCube[i*4][i*4][j]);
+				assertEquals("Round key: " + i + " wasn't correctly generated.",
+						roundKeys[i][j], fuzzCube[i*4][i*4][j]);
 			}
 		}
-		
+	}
+
+	@Test
+	public void testFuzzying(){
 		/*Test the fuzzying.
 		 * Create Arrays with elements from the fuzzCube.
 		 * sameRow has tupel from the fuzzCube with x, x+1.
@@ -150,45 +167,49 @@ public class TestCube {
 			z++;
 		}
 		
-		fuzz.fuzz(sameRow, false); //isFuzzed is for the unfuzzying, the only difference is the direction variable!.
+		fuzz.fuzz(sameRow, false); //isFuzzed is for the unfuzzying, the only difference is the direction variable.
 		fuzz.fuzz(sameColumn, false);
 		fuzz.fuzz(bothDifferent, false);
 		
 		z = 0;
-		for(int i = 0; i < 512; i +=2){
-			assertEquals(sameRow[i/256][i%256], fuzzCube[(i+1)%256][i/256][z%256]); // row += 1
-			assertEquals(sameRow[i/256][(i+1)%256], fuzzCube[(i+2)%256][i/256][z%256]); // row += 1
-			assertEquals(sameColumn[i/256][i%256], fuzzCube[i%256][(i/256+1)%256][z%256]); // column += 1
-			assertEquals(sameColumn[i/256][(i+1)%256], fuzzCube[i%256][(i/256+2)%256][z%256]); // column += 1
-			assertEquals(bothDifferent[i/256][i%256], fuzzCube[(i+5)%256][i/256][z%256]); // rowA = rowB
-			assertEquals(bothDifferent[i/256][(i+1)%256], fuzzCube[i%256][((i/256+1)%256)][z%256]); // rowB = rowA
+		for(int i = 0; i < 512; i +=2){ //testBlocks[y][x] , fuzzCube[x][y][z]
+			assertEquals("Same row xA wrong fuzzed", 
+					sameRow[i/256][i%256], fuzzCube[(i+1)%256][i/256][z%256]); // row += 1
+			assertEquals("Same row xB wrong fuzzed",
+					sameRow[i/256][(i+1)%256], fuzzCube[(i+2)%256][i/256][z%256]); // row += 1
+			assertEquals("Same column yA wrong fuzzed",
+					sameColumn[i/256][i%256], fuzzCube[i%256][(i/256+1)%256][z%256]); // column += 1
+			assertEquals("Same column yB wrong fuzzed",
+					sameColumn[i/256][(i+1)%256], fuzzCube[i%256][(i/256+2)%256][z%256]); // column += 1
+			assertEquals("Both different xA wrong fuzzed",
+					bothDifferent[i/256][i%256], fuzzCube[(i+5)%256][i/256][z%256]); // rowA = rowB
+			assertEquals("Both different xB wrong fuzzed",
+					bothDifferent[i/256][(i+1)%256], fuzzCube[i%256][((i/256+1)%256)][z%256]); // rowB = rowA
 			z++;
 		}
-		
+	}
+
+	@Test
+	public void testFeistelNet(){
 		/*Test the feistel net.
 		 * Encrypt a realistic preprocessed and fuzzed String, then decrypt it, unfuzz, reverse preprocessing
 		 * and compare it with the original.
 		 */
-		Integer[][] preprocessedText = prep.preprocess(plaintxt);				//Preprocess
-		Integer[][] fuzzedText = fuzz.fuzz(preprocessedText, false);			//Fuzzying
-		Integer[][] encrypted = feistel.run(fuzzedText, roundKeys);				//Encryption
-		Integer[][] decrypted = feistel.run(encrypted, invertedRoundKeys);		//Decryption
+		preprocessedText = prep.preprocess(plaintxt);				//Preprocess
+		fuzzedText = fuzz.fuzz(preprocessedText, false);			//Fuzzying
+		encrypted = feistel.run(fuzzedText, roundKeys);				//Encryption
+		decrypted = feistel.run(encrypted, invertedRoundKeys);		//Decryption
 		
-		//Perform an innertest just for the feistel net.
-		//assertEquals(Object[],Object[]) is deprecated.
-		String before = "", after = "";
+		//Perform an inner test, where just the feistel net is tested! ( F~(F(I)) = I )
 		for(int i = 0; i < fuzzedText.length; i++){
 			for(int j = 0; j < fuzzedText[i].length; j++){
-				before += fuzzedText[i][j];
-				after += decrypted[i][j]; //The feistel net doesn't change the length of the strings.
+				assertEquals(fuzzedText[i][j], decrypted[i][j]);
 			}
 		}
-		assertEquals(before, after); //Compare the encryption input with the decryption output.
 		
-		Integer[][] unFuzzed = fuzz.fuzz(decrypted, true);						//Unfuzzying
-		String decStr = prep.reversePreToStr(unFuzzed);							//Returns original string
+		unfuzzed = fuzz.fuzz(decrypted, true);						//Unfuzzying
+		String decStr = prep.reversePreToStr(unfuzzed);				//Returns original string
 		
-		assertEquals(plaintxt,decStr); //Test the whole procedure.
+		assertEquals(plaintxt,decStr); //Compare the result of the whole procedure with the original String.
 	}
-
 }

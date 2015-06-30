@@ -16,8 +16,8 @@ public class Preprocessor {
 	 * 3. Pad to a multiple of 512 UI
 	 * 4. Return an integer array with 512 UI long blocks.
 	 * 
-	 * This class works with integers from the very beginning to make
-	 * the whole project consistent.
+	 * This project works with integers from the very beginning to make
+	 * everything consistent.
 	 * @param str
 	 * @return preprocessed integer array.
 	 */
@@ -30,31 +30,25 @@ public class Preprocessor {
 	}
 	
 	/**
-	 * An overloaded preprocess scheduler like above, with the difference, that this
-	 * one accepts integer arrays.
+	 * Preprocess scheduler
+	 * 1. Remove twins
+	 * 2. Pad terminator symbol
+	 * 3. Pad to a multiple of 512 UI
+	 * 4. Return an integer array with 512 UI long blocks.
+	 * 
+	 * This project works with integers from the very beginning to make
+	 * everything consistent.
 	 * @param intArr
 	 * @return preprocessed integer array.
 	 */
-	public Integer[][] preprocess(Integer[] intArr){
+	public Integer[][] preprocess(Integer[] intArr) throws IllegalArgumentException{
+		if(!checkElements(intArr))
+			throw new IllegalArgumentException("The input contains illegal elements");
+		
 		List<Integer> preList = removeTwins(intArr);
 		preList = padTerminator(preList);
 		preList = padMultipleUI(preList);
 		return getBlocks(preList);
-	}
-	
-	/**
-	 * Create a enumeration for the input and return it as an integer array.
-	 * @param str
-	 * @return intArr
-	 */
-	private Integer[] getIntFromStr(String str){
-		Integer[] intArr = new Integer[str.length()];
-		
-		for(int i = 0; i < str.length(); i ++){
-			intArr[i] = (int)str.charAt(i);
-		}
-		
-		return intArr;
 	}
 
 	/**
@@ -197,5 +191,35 @@ public class Preprocessor {
 		}
 		
 		return output;
+	}
+	
+	/**
+	 * This method checks the input elements whether they are >0 and <65536.
+	 * This implementation of PowahCube doesn't accept such inputs, there is nothing explicit
+	 * said in the tasks, whether it should and only modulo them in the range or not.
+	 * @param key
+	 * @return result
+	 */
+	private boolean checkElements(Integer[] input){
+		for(int i = 0; i < input.length; i++){
+			if(input[i] > 65535 || input[i] < 0)
+				return false;
+		}
+		return true;
+	}
+	
+	/**
+	 * Create a enumeration for the input and return it as an integer array.
+	 * @param str
+	 * @return intArr
+	 */
+	private Integer[] getIntFromStr(String str){
+		Integer[] intArr = new Integer[str.length()];
+		
+		for(int i = 0; i < str.length(); i ++){
+			intArr[i] = (int)str.charAt(i);
+		}
+		
+		return intArr;
 	}
 }

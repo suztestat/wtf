@@ -16,15 +16,16 @@ public class FuzzCube {
 	 * This constructor initialize the fuzz cube and call the method
 	 * buildFuzzCube() which generate the fuzz cube with the key string, which
 	 * is given by the constructors argument.
+	 * There needn't be an element check because the chars in the String can't
+	 * be out of range.
 	 * @param key
 	 * @throws IllegalArgumentException
 	 */
 	public FuzzCube(String key) throws IllegalArgumentException{
-		if(key.length() < 65536){
-			mFuzzCube = new Integer[256][256][256];
-			mKey = getIntFromStr(key);
-			buildFuzzCube();
-		} else
+		mFuzzCube = new Integer[256][256][256];
+		mKey = getIntFromStr(key);
+		boolean isBuilt = buildFuzzCube();
+		if(!isBuilt)
 			throw new IllegalArgumentException("The key is too long.");
 	}
 	
@@ -36,25 +37,31 @@ public class FuzzCube {
 	 * @throws IllegalArgumentException
 	 */
 	public FuzzCube(Integer[] key) throws IllegalArgumentException{
-		if(key.length < 65536){
-			mFuzzCube = new Integer[256][256][256];
-			mKey = key;
-			buildFuzzCube();
-		} else
+		if(!checkElements(key))
+			throw new IllegalArgumentException("The key contains illegal elements");
+		mFuzzCube = new Integer[256][256][256];
+		mKey = key;
+		boolean isBuilt = buildFuzzCube();
+		if(!isBuilt)
 			throw new IllegalArgumentException("The key is too long.");
 	}
 	
 	/**
 	 * This method prepare the key and aleph, creates omega and
 	 * call the method generateCube with them.
+	 * @return result
 	 */
-	private void buildFuzzCube(){
+	private boolean buildFuzzCube(){
 		Set<Integer> keySet = removeRedundantElements(mKey);
-		Set<Integer> compSet = getNcomplement(keySet, 65536);
-		
-		mOmega = fillV_Slice(keySet);
-		mOmega = padV_Slice(mOmega, compSet);
-		generateCube(keySet, compSet);
+		if(keySet.size() < 65536){
+			Set<Integer> compSet = getNcomplement(keySet, 65536);
+			
+			mOmega = fillV_Slice(keySet);
+			mOmega = padV_Slice(mOmega, compSet);
+			generateCube(keySet, compSet);
+			return true;
+		}
+		return false;
 	}
 	
 	/**
@@ -185,7 +192,7 @@ public class FuzzCube {
 	}
 	
 	/**
-	 * Fuzz or Unfuzz the input with the fuzzCube.
+	 * Fuzz or unfuzz the input with the fuzzCube.
 	 * Same Row: xA + 1, xB + 1
 	 * Same Column: yA + 1, yB + 1
 	 * Both different: xA = xB, xB = xA
@@ -237,6 +244,21 @@ public class FuzzCube {
 			}
 		}
 		return input;
+	}
+	
+	/**
+	 * This method checks the input key elements whether they are >0 and <65536.
+	 * This implementation of PowahCube doesn't accept such keys, there is nothing explicit
+	 * said in the tasks, whether it should and only modulo them in the range or not.
+	 * @param key
+	 * @return result
+	 */
+	private boolean checkElements(Integer[] key){
+		for(int i = 0; i < key.length; i++){
+			if(key[i] > 65535 || key[i] < 0)
+				return false;
+		}
+		return true;
 	}
 	
 	/**
